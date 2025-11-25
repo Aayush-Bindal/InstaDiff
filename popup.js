@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- UI Elements ---
   const btnFollowing = document.getElementById('btn-following');
   const btnFollowers = document.getElementById('btn-followers');
+  const btnResetScanner = document.getElementById('btn-reset-scanner'); // New Button
   const statusText = document.getElementById('status-text');
   
   // Download Buttons
@@ -104,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderDiffResult(traitors, shouldSave) {
-    currentTraitors = traitors; // Save to global variable for download
+    currentTraitors = traitors; 
     
     const resultsArea = document.getElementById('results-area');
     const diffList = document.getElementById('diff-list');
@@ -130,7 +131,25 @@ document.addEventListener('DOMContentLoaded', () => {
     if (shouldSave) addToHistory(traitors);
   }
 
-  // --- DOWNLOAD FUNCTIONS ---
+  // --- 5. RESET / DOWNLOAD / HISTORY ---
+
+  // RESET SCANNER BUTTON
+  btnResetScanner.addEventListener('click', () => {
+    chrome.storage.local.remove(['following', 'followers'], () => {
+      // Reset State
+      currentTraitors = [];
+      // Reset UI text
+      document.getElementById('count-following').innerText = '';
+      document.getElementById('count-followers').innerText = '';
+      document.getElementById('btn-following').innerText = 'Scrape Following';
+      document.getElementById('btn-followers').innerText = 'Scrape Followers';
+      statusText.innerHTML = 'Scanner data cleared.';
+      
+      // Hide Results
+      document.getElementById('results-area').style.display = 'none';
+    });
+  });
+
   btnDownloadCsv.addEventListener('click', () => {
     if(!currentTraitors.length) return;
     const csvContent = "data:text/csv;charset=utf-8," + "Username,Profile URL\n" + 
@@ -160,8 +179,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.removeChild(link);
   });
 
-
-  // --- 5. HISTORY ---
   function addToHistory(traitors) {
     if(traitors.length === 0) return;
     
