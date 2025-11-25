@@ -1,10 +1,14 @@
 {
-  "name": "Followers Assistant",
-  "description": "An instagram extention which helps you find who follows you back",
-  "version": "1.0",
   "manifest_version": 3,
+  "name": "Insta Unfollower Tracker",
+  "version": "1.0",
+  "description": "Find out who doesn't follow you back using plain HTML diffing.",
+  "permissions": ["activeTab", "scripting", "storage"],
   "action": {
     "default_popup": "popup.html",
     "default_icon": "icon.png"
+  },
+  "icons": {
+    "128": "icon.png"
   }
 }
