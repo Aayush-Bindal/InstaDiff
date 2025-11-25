@@ -1,11 +1,12 @@
 # InstaDiff - Instagram Unfollower Tracker
 
-**InstaDiff** is a lightweight, privacy-focused Chrome Extension designed to identify users who do not follow you back on Instagram.
+**InstaDiff** is a lightweight, privacy-focused Chrome and **Firefox** WebExtension designed to identify users who do not follow you back on Instagram.
 
 This tool operates locally in your browser, performing a list comparison ("diff") without requiring you to log in to third-party services or use any of Instagram's official APIs.
 
 ## Key Features
 
+* **Cross-Browser Compatible:** Works seamlessly on **Chrome and Firefox**.
 * **Privacy-Focused:** Requires **no login** and operates entirely within your browser environment. Your password and data are never transmitted to an external server.
 * **Automatic Scraping:** Features robust auto-scroll logic (`scraper.js`) to accurately capture long "Following" and "Followers" lists, handling Instagram's lazy loading mechanism.
 * **Persistent History:** A dedicated "History" tab tracks and stores previous scan results in your browser's local storage, allowing you to monitor changes over time.
@@ -17,16 +18,22 @@ This tool operates locally in your browser, performing a list comparison ("diff"
 
 ## 🚀 Installation (Developer Mode)
 
+Since this tool uses HTML scraping, it is intended for personal use and must be installed via Developer Mode on both browsers.
 
-Since this tool uses HTML scraping, it is intended for personal use and must be installed via Developer Mode.
+### For Google Chrome
 
-1.  **Download the Code:** Clone or download the source code files (`manifest.json`, `popup.html`, `popup.js`, `scraper.js`, `icon.png`).
-2.  **Open Extensions:** Navigate to `chrome://extensions/` in your Chrome browser.
-3.  **Enable Developer Mode:** Toggle the **Developer mode** switch located in the upper right corner to **ON**.
+1.  **Download the Code:** Clone or download the source code files.
+2.  **Open Extensions:** Navigate to `chrome://extensions/`.
+3.  **Enable Developer Mode:** Toggle the **Developer mode** switch in the upper right corner to **ON**.
 4.  **Load Extension:** Click the **Load unpacked** button.
 5.  **Select Folder:** Choose the main directory containing the extension files.
 
-The **InstaDiff** icon should now appear in your browser toolbar.
+### For Mozilla Firefox
+
+1.  **Download the Code:** Clone or download the source code files.
+2.  **Open Debugging:** Navigate to `about:debugging#/runtime/this-firefox` in the address bar.
+3.  **Load Add-on:** Click the **Load Temporary Add-on...** button.
+4.  **Select Manifest:** Navigate to your `InstaDiff` folder and select the **`manifest.json`** file.
 
 ***
 
