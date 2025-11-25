@@ -77,7 +77,20 @@
       font-size: 12px;
       margin-top: 5px;
     }
-    .user-row { padding: 4px; border-bottom: 1px solid #222; }
+    
+    /* LINK STYLES */
+    .user-row { border-bottom: 1px solid #222; }
+    .user-link {
+      display: block; /* Makes the whole row clickable */
+      color: #FAFAFA;
+      text-decoration: none;
+      padding: 6px 4px;
+      transition: background 0.2s;
+    }
+    .user-link:hover {
+      background-color: #333;
+      color: #FF3040;
+    }
     
     /* History Specifics */
     .history-item {
@@ -141,15 +154,13 @@
 
       <div id="results-area" class="card" style="border-color: #FF3040;">
         <div class="step-title" style="color: #FF3040;">Traitors (<span id="diff-count">0</span>)</div>
-        <div style="font-size: 11px; color: #ccc; margin-bottom: 5px;">Results saved to History automatically.</div>
+        <div style="font-size: 11px; color: #ccc; margin-bottom: 5px;">Click a name to visit profile:</div>
         <div class="list-container" id="diff-list"></div>
       </div>
     </div>
 
     <div id="view-history" style="display: none;">
-      <div id="history-list">
-        <p style="text-align: center; color: #555; font-size: 12px;">No history found.</p>
-      </div>
+      <div id="history-list"></div>
       <button id="btn-clear-history" class="btn btn-clear">Clear All History</button>
     </div>
 

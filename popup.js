@@ -12,14 +12,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnClearHistory = document.getElementById('btn-clear-history');
 
   // --- 1. INITIALIZATION ---
-  // Load saved scan data to show counts on buttons
   chrome.storage.local.get(['following', 'followers'], (result) => {
     if(result.following) updateUI('following', result.following.length);
     if(result.followers) updateUI('followers', result.followers.length);
-    // We don't auto-calculate diff on load anymore to prevent duplicate history entries
-    // But if we wanted to show the last result, we could.
     if(result.following && result.followers) {
-        renderDiffResult(calculateDiff(result.following, result.followers), false); // false = don't save to history
+        renderDiffResult(calculateDiff(result.following, result.followers), false); 
     }
   });
 
@@ -55,7 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Handle messages from scraper.js
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === "ERROR") {
       statusText.innerHTML = `<span style="color:#FF3040">${message.message}</span>`;
@@ -66,25 +62,18 @@ document.addEventListener('DOMContentLoaded', () => {
     else if (message.type === "DONE") {
       chrome.storage.local.get(['currentScrapeType'], (result) => {
         const type = result.currentScrapeType;
-        
         let data = {};
         data[type] = message.users;
         
         chrome.storage.local.set(data, () => {
           updateUI(type, message.users.length);
           
-          // Check for Diff
           chrome.storage.local.get(['following', 'followers'], (res) => {
             if (res.following && res.followers) {
                 const traitors = calculateDiff(res.following, res.followers);
-                
-                // Only save to history if we just finished the Followers scan (Step 2)
-                // or if we just finished Following and already had Followers.
-                // To avoid duplicates, let's strictly save when specific actions complete.
-                // Simplest: Save every time a new diff is successfully calculated after a scrape.
-                renderDiffResult(traitors, true); // true = save to history
+                // Save to history automatically if results found
+                renderDiffResult(traitors, true); 
             }
-            
             statusText.innerHTML = (type === 'following') 
               ? "<strong>Following Done!</strong> Now open 'Followers' and click Step 2."
               : "<strong>All Done!</strong> Results calculated and saved.";
@@ -104,10 +93,10 @@ document.addEventListener('DOMContentLoaded', () => {
   function calculateDiff(following, followers) {
     const followingSet = following;
     const followersSet = new Set(followers);
-    // Who is in Following but NOT in Followers
     return followingSet.filter(user => !followersSet.has(user));
   }
 
+  // Updated to create Clickable Links
   function renderDiffResult(traitors, shouldSave) {
     const resultsArea = document.getElementById('results-area');
     const diffList = document.getElementById('diff-list');
@@ -117,10 +106,19 @@ document.addEventListener('DOMContentLoaded', () => {
     diffCount.innerText = traitors.length;
     
     diffList.innerHTML = '';
+    
+    // Create Clickable Rows
     traitors.forEach(user => {
       const div = document.createElement('div');
       div.className = 'user-row';
-      div.innerText = user;
+      
+      const link = document.createElement('a');
+      link.className = 'user-link';
+      link.href = `https://www.instagram.com/${user}/`;
+      link.target = '_blank'; // Opens in new tab
+      link.innerText = user;
+      
+      div.appendChild(link);
       diffList.appendChild(div);
     });
 
@@ -130,7 +128,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function addToHistory(traitors) {
-    // prevent saving empty or duplicate spam (optional, keeping it simple here)
+    if(traitors.length === 0) return;
+    
     const record = {
       id: Date.now(),
       date: new Date().toLocaleString(),
@@ -139,11 +138,22 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     chrome.storage.local.get({ history: [] }, (result) => {
-      const newHistory = [record, ...result.history]; // Add to top
+      // Avoid duplicate save if top entry is identical
+      const currentHistory = result.history;
+      if (currentHistory.length > 0) {
+        // Simple check: same count and same first user
+        if (currentHistory[0].count === record.count && 
+            JSON.stringify(currentHistory[0].users) === JSON.stringify(record.users)) {
+          return;
+        }
+      }
+      
+      const newHistory = [record, ...result.history];
       chrome.storage.local.set({ history: newHistory });
     });
   }
 
+  // Updated History UI with Links
   function loadHistoryUI() {
     const historyList = document.getElementById('history-list');
     chrome.storage.local.get({ history: [] }, (result) => {
@@ -154,24 +164,27 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      historyList.innerHTML = ''; // Clear current list
+      historyList.innerHTML = ''; 
 
       history.forEach(item => {
         const div = document.createElement('div');
         div.className = 'history-item';
         
-        // Header (Clickable)
+        // Generate clickable links for the details section
+        const userLinksHTML = item.users.map(u => 
+          `<div class="user-row"><a class="user-link" href="https://www.instagram.com/${u}/" target="_blank">${u}</a></div>`
+        ).join('');
+
         div.innerHTML = `
           <div class="history-header">
             <span class="history-date">${item.date}</span>
             <span class="history-count">${item.count} Traitors</span>
           </div>
           <div class="history-details" style="display:none;">
-            ${item.users.join('<br>')}
+            ${userLinksHTML}
           </div>
         `;
         
-        // Toggle details on click
         div.querySelector('.history-header').addEventListener('click', () => {
           const details = div.querySelector('.history-details');
           details.style.display = details.style.display === 'none' ? 'block' : 'none';
