@@ -5,7 +5,7 @@
   <title>InstaDiff</title>
   <style>
     body {
-      width: 340px;
+      width: 350px; /* Made slightly wider for buttons */
       background-color: #121212;
       color: #FAFAFA;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -77,11 +77,24 @@
       font-size: 12px;
       margin-top: 5px;
     }
+
+    /* Action Buttons Row */
+    .actions-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .btn-secondary {
+      background-color: #333;
+      color: #FAFAFA;
+      font-size: 11px;
+    }
+    .btn-secondary:hover { background-color: #444; }
     
     /* LINK STYLES */
     .user-row { border-bottom: 1px solid #222; }
     .user-link {
-      display: block; /* Makes the whole row clickable */
+      display: block; 
       color: #FAFAFA;
       text-decoration: none;
       padding: 6px 4px;
@@ -155,7 +168,13 @@
       <div id="results-area" class="card" style="border-color: #FF3040;">
         <div class="step-title" style="color: #FF3040;">Traitors (<span id="diff-count">0</span>)</div>
         <div style="font-size: 11px; color: #ccc; margin-bottom: 5px;">Click a name to visit profile:</div>
+        
         <div class="list-container" id="diff-list"></div>
+
+        <div class="actions-row">
+          <button id="btn-download-csv" class="btn btn-secondary">Download CSV</button>
+          <button id="btn-download-txt" class="btn btn-secondary">Download Text</button>
+        </div>
       </div>
     </div>
 
