@@ -5,15 +5,37 @@
   <title>InstaDiff</title>
   <style>
     body {
-      width: 320px;
+      width: 340px;
       background-color: #121212;
       color: #FAFAFA;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      padding: 16px;
+      padding: 0;
       margin: 0;
     }
-    h1 { font-size: 18px; margin-bottom: 5px; text-align: center; }
-    p.subtitle { font-size: 12px; color: #A8A8A8; text-align: center; margin-top: 0; margin-bottom: 20px;}
+
+    /* Navigation Tabs */
+    .nav {
+      display: flex;
+      border-bottom: 1px solid #363636;
+      background-color: #1e1e1e;
+    }
+    .nav-item {
+      flex: 1;
+      text-align: center;
+      padding: 15px 0;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      color: #888;
+    }
+    .nav-item.active {
+      color: #0095F6;
+      border-bottom: 2px solid #0095F6;
+    }
+    .nav-item:hover { background-color: #262626; }
+
+    /* Main Container */
+    .container { padding: 16px; }
 
     .card {
       background-color: #262626;
@@ -37,19 +59,14 @@
       font-size: 13px;
     }
     .btn:hover { background-color: #1877F2; }
-    .btn:disabled { background-color: #444; color: #888; cursor: not-allowed; }
-
+    
     .status-box {
       font-size: 12px;
       line-height: 1.4;
       color: #A8A8A8;
-      min-height: 40px;
     }
 
-    #results-area {
-      display: none; /* Hidden until results are ready */
-      margin-top: 15px;
-    }
+    #results-area { display: none; margin-top: 15px; }
     
     .list-container {
       max-height: 150px;
@@ -61,40 +78,81 @@
       margin-top: 5px;
     }
     .user-row { padding: 4px; border-bottom: 1px solid #222; }
-    .user-row:last-child { border-bottom: none; }
-    .highlight { color: #FF3040; font-weight: bold; }
+    
+    /* History Specifics */
+    .history-item {
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      padding: 10px;
+    }
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+    .history-date { font-size: 12px; color: #aaa; }
+    .history-count { color: #FF3040; font-weight: bold; font-size: 12px; }
+    .history-details { 
+      display: none; 
+      margin-top: 8px; 
+      padding-top: 8px; 
+      border-top: 1px solid #333; 
+      font-size: 11px; 
+      color: #ccc;
+    }
+    .btn-clear { background-color: #333; color: #bbb; margin-top: 10px; }
+    .btn-clear:hover { background-color: #FF3040; color: white; }
+
   </style>
 </head>
 <body>
 
-  <h1>InstaDiff</h1>
-  <p class="subtitle">Plain Diffing / No Login Required</p>
+  <div class="nav">
+    <div id="tab-btn-scan" class="nav-item active">Scanner</div>
+    <div id="tab-btn-history" class="nav-item">History</div>
+  </div>
 
-  <div class="card">
-    <div id="status-text" class="status-box">
-      <strong>Instructions:</strong><br>
-      1. Go to your Instagram Profile.<br>
-      2. Click your "Following" count to open the list.<br>
-      3. Click "Scrape Following" below.
+  <div class="container">
+    
+    <div id="view-scan">
+      <div class="card">
+        <div id="status-text" class="status-box">
+          <strong>Instructions:</strong><br>
+          1. Open Instagram Profile.<br>
+          2. Click "Following" & Scrape (Step 1).<br>
+          3. Click "Followers" & Scrape (Step 2).
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="step-title">Step 1: Following</div>
+        <button id="btn-following" class="btn">Scrape Following</button>
+        <div id="count-following" style="font-size: 11px; margin-top:5px; text-align:right; color:#0095F6;"></div>
+      </div>
+
+      <div class="card">
+        <div class="step-title">Step 2: Followers</div>
+        <button id="btn-followers" class="btn">Scrape Followers</button>
+        <div id="count-followers" style="font-size: 11px; margin-top:5px; text-align:right; color:#0095F6;"></div>
+      </div>
+
+      <div id="results-area" class="card" style="border-color: #FF3040;">
+        <div class="step-title" style="color: #FF3040;">Traitors (<span id="diff-count">0</span>)</div>
+        <div style="font-size: 11px; color: #ccc; margin-bottom: 5px;">Results saved to History automatically.</div>
+        <div class="list-container" id="diff-list"></div>
+      </div>
     </div>
-  </div>
 
-  <div class="card">
-    <div class="step-title">Step 1: Get Who You Follow</div>
-    <button id="btn-following" class="btn">Scrape "Following" List</button>
-    <div id="count-following" style="font-size: 11px; margin-top:5px; text-align:right; color:#0095F6;"></div>
-  </div>
+    <div id="view-history" style="display: none;">
+      <div id="history-list">
+        <p style="text-align: center; color: #555; font-size: 12px;">No history found.</p>
+      </div>
+      <button id="btn-clear-history" class="btn btn-clear">Clear All History</button>
+    </div>
 
-  <div class="card">
-    <div class="step-title">Step 2: Get Your Followers</div>
-    <button id="btn-followers" class="btn">Scrape "Followers" List</button>
-    <div id="count-followers" style="font-size: 11px; margin-top:5px; text-align:right; color:#0095F6;"></div>
-  </div>
-
-  <div id="results-area" class="card" style="border-color: #FF3040;">
-    <div class="step-title" style="color: #FF3040;">Traitors (<span id="diff-count">0</span>)</div>
-    <div style="font-size: 11px; color: #ccc; margin-bottom: 5px;">These people do not follow you back:</div>
-    <div class="list-container" id="diff-list"></div>
   </div>
 
   <script src="popup.js"></script>
